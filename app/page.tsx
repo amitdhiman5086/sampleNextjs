@@ -3,6 +3,7 @@ import { unstable_cache } from "next/cache";
 
 const getCachedData = unstable_cache(
   async () => {
+    console.log('Fetching fresh data (Cache MISS) in my-app');
     const res = await fetch('https://jsonplaceholder.typicode.com/todos/1');
     const data = await res.json();
     return `Cached API Data: ${data.title} (Generated at ${new Date().toLocaleTimeString()})`;
