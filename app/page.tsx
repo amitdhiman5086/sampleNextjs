@@ -9,7 +9,6 @@ const getCachedData = unstable_cache(
     return `Cached API Data: ${data.title} (Generated at ${new Date().toLocaleTimeString()})`;
   },
   ['my-cache-key'],
-  { revalidate: 60 }
 );
 
 export default async function Home() {
