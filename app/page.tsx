@@ -1,32 +1,9 @@
 import Image from "next/image";
-
-type ApiResult = {
-  source: string;
-  data: { id: number; title: string; completed: boolean };
-  fetchedAt: string;
-};
-
-async function getCachedResult(): Promise<ApiResult> {
-  // Server-side fetch to our own cached API route
-  const res = await fetch("http://localhost:3000/api/cached", {
-    next: { revalidate: 60 },
-  });
-  return res.json();
-}
-
-async function getLiveResult(): Promise<ApiResult> {
-  // Server-side fetch to our own live (no-cache) API route
-  const res = await fetch("http://localhost:3000/api/live", {
-    cache: "no-store",
-  });
-  return res.json();
-}
+import { getCachedTodo, getLiveTodo } from "@/lib/todo";
 
 export default async function Home() {
-  const [cached, live] = await Promise.all([
-    getCachedResult(),
-    getLiveResult(),
-  ]);
+  // Both are called directly — no HTTP self-fetch needed
+  const [cached, live] = await Promise.all([getCachedTodo(), getLiveTodo()]);
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -45,12 +22,12 @@ export default async function Home() {
             Caching Demo
           </h1>
 
-          {/* Cached API Result */}
+          {/* Cached Result */}
           <div className="p-5 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-xl shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
               <h2 className="text-sm font-semibold text-green-700 dark:text-green-300 uppercase tracking-wider">
-                /api/cached — with unstable_cache
+                With unstable_cache — /api/cached
               </h2>
             </div>
             <p className="text-xs font-mono text-green-800 dark:text-green-200 mb-1">
@@ -62,17 +39,14 @@ export default async function Home() {
             <p className="text-xs font-mono text-green-600 dark:text-green-400">
               <span className="font-bold">Fetched At:</span> {cached.fetchedAt}
             </p>
-            <p className="mt-2 text-xs text-green-600 dark:text-green-500 italic">
-              ↻ This timestamp stays the same for 60s — it&apos;s served from cache.
-            </p>
           </div>
 
-          {/* Live API Result */}
+          {/* Live Result */}
           <div className="p-5 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-xl shadow-sm">
             <div className="flex items-center gap-2 mb-3">
               <span className="inline-block w-2 h-2 rounded-full bg-blue-500 animate-pulse"></span>
               <h2 className="text-sm font-semibold text-blue-700 dark:text-blue-300 uppercase tracking-wider">
-                /api/live — no cache
+                No Cache — /api/live
               </h2>
             </div>
             <p className="text-xs font-mono text-blue-800 dark:text-blue-200 mb-1">
@@ -85,7 +59,7 @@ export default async function Home() {
               <span className="font-bold">Fetched At:</span> {live.fetchedAt}
             </p>
             <p className="mt-2 text-xs text-blue-600 dark:text-blue-500 italic">
-              ↻ This timestamp changes on every page reload — no cache used.
+              ↻ This timestamp changes on every reload — no cache used.
             </p>
           </div>
         </div>
