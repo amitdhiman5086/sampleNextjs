@@ -3,9 +3,12 @@ import { unstable_cache } from "next/cache";
 
 const getCachedData = unstable_cache(
   async () => {
-    return `Cached data generated at ${new Date().toLocaleTimeString()}`;
+    const res = await fetch('https://jsonplaceholder.typicode.com/todos/1');
+    const data = await res.json();
+    return `Cached API Data: ${data.title} (Generated at ${new Date().toLocaleTimeString()})`;
   },
-  ['my-cache-key']
+  ['my-cache-key'],
+  { revalidate: 60 }
 );
 
 export default async function Home() {
