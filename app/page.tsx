@@ -1,6 +1,16 @@
 import Image from "next/image";
+import { unstable_cache } from "next/cache";
 
-export default function Home() {
+const getCachedData = unstable_cache(
+  async () => {
+    return `Cached data generated at ${new Date().toLocaleTimeString()}`;
+  },
+  ['my-cache-key']
+);
+
+export default async function Home() {
+  const cachedData = await getCachedData();
+
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
       <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
@@ -16,6 +26,11 @@ export default function Home() {
           <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
             To get started, edit the page.tsx file.
           </h1>
+          <div className="p-4 bg-green-100 dark:bg-green-900 rounded-lg shadow w-full">
+            <p className="text-sm font-mono text-green-800 dark:text-green-200">
+              {cachedData}
+            </p>
+          </div>
           <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
             Looking for a starting point or more instructions? Head over to{" "}
             <a
